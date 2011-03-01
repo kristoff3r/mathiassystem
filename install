@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# Installs mathiassystem (grouped in categories)
+#
+
+#
+# Loads argument
+#
+
+if [ -z $1 ]; then
+    arg="help"
+else
+    arg=$1
+fi
+
+#
+# Local functions
+#
+
+# Tranforms /home/$USER to /home/user
+makeGenericHome() {
+    echo $1 | sed -e "s@^/home/$USER@/home/user@"
+}
+
+makeUserHome() {
+    echo $1 | sed -e "s@^/home/user@/home/$USER@"
+}
+
+# Selects all files from a certain group
+files=$(
+    find root/ -type f | sed -e "s@^\.@@" -e "s@^/home/user@/home/$USER@" |
+    grep -v -f blacklist)
+
+# Installs specific categories
+# Each line in the file $1 is interpreted as a file and copied
+installCategory() {
+    while read myLine
+    do
+        echo "Installing `makeUserHome $myLine`"
+        cp root/$myLine `makeUserHome $myLine`
+    done < $1
+}
+
+
+
+#
+# Installation (prints help if argument is invalid)
+#
+
+case $arg in
+        --all )
+        # Installs all files without prompts
+            for file in $files; do
+                echo -n "Installing" echo $file
+                if awk "^/home/"; then
+                    echo "LOL"
+                else
+                    echo "ROFL"
+                fi
+             #   cp -f $file .`makeGenericHome $file`
+            done;;
+        --acpi )
+            installCategory acpi;;
+        --network )
+            echo "Installing category: Network"
+            installCategory network;;
+        --configuration )
+            echo "conf";;
+        --window )
+            echo "Installing category: Window Manager"
+            installCategory window;;
+        --acpi )
+            echo "acpi";;
+        --scripts )
+            echo "Installing category: Scripts"
+            installCategory scripts;;
+        --programming )
+            ;;
+         * ) 
+            echo "halp";;
+esac
+
+
+
+
